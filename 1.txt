@@ -1,0 +1,15 @@
+3
+5
+2 2 Brown
+1 1 Brown
+1 0 Cony
+0 0 Cony
+-1 -1 Cony
+3
+3 5 Brown
+4 2 Cony
+1 1 Brown
+3
+2 2 Brown
+1 1 Cony
+0 0 Brown

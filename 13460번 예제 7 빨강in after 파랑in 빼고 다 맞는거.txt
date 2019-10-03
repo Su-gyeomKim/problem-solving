@@ -1,0 +1,81 @@
+#include <iostream>
+#include <queue>
+#include <algorithm>
+
+#pragma warning(disable:4996)
+#define _CRT_NO_SECURE_WARNINGS
+
+using namespace std;
+#define N 12
+//0좌 1상 2우 3하
+int yx[4][2] = { {0,-1},{-1,0},{0,1},{1,0} };
+char map[N][N];
+int n, m;
+int ans=2147468347;
+bool print, goal;
+
+struct pos {int y, x, color,cnt;} B,R,O;
+queue<pos> q;
+int R_goal, B_goal;
+
+void bfs() {
+	while (!q.empty()) {
+		pos ball = q.front();
+		int y = ball.y;
+		int x = ball.x;
+		q.pop();
+
+		bool red=0;
+		if (ball.color) red = 1;
+		ball.cnt++;
+
+		for (int d = 0; d < 4; d++) {
+			int ny = y, nx = x;
+
+			while (ny >= 0 && nx >= 0 && ny < n && nx < m && map[ny][nx] != '#' && map[ny][nx] != 'O') {
+				ny += yx[d][0], nx += yx[d][1];
+			}
+			ny -= yx[d][0], nx -= yx[d][1];
+			
+			if (map[y][x] != map[ny][nx]) {
+				if (red) {
+					//map[ny][nx]는 이동한 다음을 점검 못함 고정이기 때문에 그래서 이동하고 큐에 넣은거 체크 필요
+					if (map[ny][nx] == 'B')		ball.y = ny-yx[d][0], ball.x = nx-yx[d][1], ball.color = red; 
+					else ball.y = ny, ball.x = nx, ball.color = red;
+					if (map[y][x] != map[ball.y][ball.x]) {
+						q.push(ball); map[ny][nx] = 'R';
+					}
+				}
+				else {
+					if (map[ny][nx] == 'R') 	ball.y = ny - yx[d][0], ball.x = nx - yx[d][1], ball.color = red;
+					else ball.y = ny, ball.x = nx, ball.color = red;
+					if (map[y][x] != map[ball.y][ball.x]) {
+						q.push(ball); map[ny][nx] = 'B';
+					}
+				}
+			}
+
+			if (map[ny + yx[d][0]][nx + yx[d][1]] == 'O' && !red) { B_goal = ball.cnt; cout << -1; print = 1; return; }
+			if (map[ny + yx[d][0]][nx + yx[d][1]] == 'O' && red) { R_goal = ball.cnt; }//{ cout << ball.cnt; }return;}
+		}
+	}
+	if (R_goal<B_goal && !print) { cout << ans; print = 1; return; }
+}
+
+int main() {
+	freopen("13460.txt", "r", stdin); setbuf(stdout, NULL);
+
+		cin >> n >> m;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++) {
+				cin >> map[i][j];
+				if (map[i][j] == 'O') O.y = i, O.x = j;
+				if (map[i][j] == 'B') { B.y = i, B.x = j, B.color = 0; q.push(B); }
+				if (map[i][j] == 'R') { R.y = i, R.x = j, R.color = 1; q.push(R); }
+			}
+
+		bfs();
+
+		if (!print) cout << -1;
+	
+}
